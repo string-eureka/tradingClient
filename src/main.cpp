@@ -6,7 +6,8 @@ int main() {
     std::cout << "Welcome to EurekaExchange!" << std::endl;
 
     try {
-        WebSocketClient client("test.deribit.com", "443", "/ws/api/v2");        
+        WebSocketClient client("test.deribit.com", "443", "/ws/api/v2");
+        client.connect();
         marketAPI::help();
 
         std::string user_input;
@@ -47,22 +48,10 @@ int main() {
 }
 
 /*
-    The following is my code for an cli  trading application that communicates via websockets. 
-    What I want you to do is to start the websocket connection in a different thread. However I want that at a time either the input loop (post Enter a message)
-    or the output (response from the websocket) takes place at a time. Implement a solution for this. Also implment the sendMessage function that directly
-    sends the string input to the websocket. Implement the close function as well.
-    Redo the Websocket functioning, a single lock/mutex exists for the read while loop in the main.cpp file and the output in the Market API file.
-    Initially the lock is empty, the read loop then aquires the lock, when a request is to be sent via the websocket, the lock is acquired by the Websockethandler.
-    Once it recieves and prints the response the lock is released and the main read loop aquires it.
-    When the read loop ends/exits, the lock is given to the websockethandler, and then the program ends.
-    
-Rewrite entire websockets code
-Store access_token in password class.
 
-Latency benchmarking and Optimization
 Implement Notifications
-
-Fix autodisconnect bug - I think it happens when the program runs in the background - windows optimizing wsl or something.
-Could be fixed by pinging the server every n minutes.
+Store access_token in password class.
+Fix exit bug
+Latency benchmarking and Optimization
 
 */

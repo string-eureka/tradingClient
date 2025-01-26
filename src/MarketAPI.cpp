@@ -71,7 +71,8 @@ std::string parse(int x) {
             return getOrderbook();
         case 7:
             return getCurrentPositions();
-
+        case 8:
+            return subscribe();
         default:
             return R"({"error": "Invalid option"})";
     }
@@ -176,4 +177,4 @@ std::string getCurrentPositions() {
     return request.dump();
 }
 
-} // namespace marketAPI
+}

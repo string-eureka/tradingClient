@@ -8,22 +8,21 @@
 #include <string>
 #include <thread>
 #include <iostream>
-#include "json.hpp"
-#include <boost/thread.hpp>
 
 namespace beast = boost::beast;
 namespace net = boost::asio;
 namespace websocket = beast::websocket;
 using tcp = net::ip::tcp;
-using json = nlohmann::json;
 
 class WebSocketClient {
 public:
     WebSocketClient(const std::string& host, const std::string& port, const std::string& endpoint);
-    // ~WebSocketClient();
+    ~WebSocketClient();
 
     void connect();
-
+    void sendMessage(const std::string& message);
+    void close();
+    void startReading();
 
 private:
     std::string host_;
@@ -32,5 +31,7 @@ private:
     net::io_context ioc_;
     net::ssl::context ssl_ctx_;
     websocket::stream<beast::ssl_stream<beast::tcp_stream>> ws_;
+    std::thread read_thread_;
 
+    void readLoop();
 };
