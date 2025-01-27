@@ -18,7 +18,7 @@ int main() {
 
         std::string userInput;
         while (true) {
-            Logger::logDebug("Waiting for user input...");
+            Logger::logIO("Waiting for user input...");
             sleep(1);
             std::cout << "Enter a message: ";
             std::getline(std::cin, userInput);

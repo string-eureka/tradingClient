@@ -1,7 +1,8 @@
 #pragma once
 #include <string.h>
 #include <iostream>
-#include <algorithm>
+#include <regex>
+#include <limits>
 #include "../include/json.hpp"
 
 namespace marketAPI
@@ -16,5 +17,5 @@ namespace marketAPI
     std::string getOrderbook();
     std::string getCurrentPositions();
     std::string subscribe();
-    
+
 }

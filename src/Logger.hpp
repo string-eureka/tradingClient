@@ -9,7 +9,7 @@ class Logger
 {
 public:
     static void logInfo(const std::string &message);
-    static void logDebug(const std::string &message);
+    static void logIO(const std::string &message);
     static void logWarn(const std::string &message);
     static void logError(const std::string &message);
     static void logResult(const nlohmann::json &message);
