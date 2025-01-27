@@ -38,7 +38,7 @@ void Logger::logResult(const nlohmann::json &message){
         output["error"] = message["error"];
     }
     if (message.contains("usDiff")) {
-        output["Response time:(ms)"] = message["usDiff"];
+        output["Response time(microseconds):"] = message["usDiff"];
     }
     std::cout << "Message Recieved" << output.dump(4) << std::endl;
     std::cout << "-------------------------------------------------------------------" << std::endl;

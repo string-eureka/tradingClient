@@ -54,7 +54,7 @@ int main() {
                 Logger::logInfo("Terminating session");
                 std::cout << "Thank you for using EurekaExchange" << std::endl;
                 std::cout << "-------------------------------------------------------------------" << std::endl;
-                break;
+                exit(0);
             } else if (cleanInput == 1) {
                 marketAPI::help();
                 continue;

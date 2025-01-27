@@ -20,9 +20,9 @@ namespace marketAPI
         }
     }
 
-    int intInput(const std::string &prompt, int min, int max)
+    double doubleInput(const std::string &prompt, double min, double max)
     {
-        int value;
+        double value;
         while (true)
         {
             std::cout << prompt;
@@ -108,7 +108,7 @@ namespace marketAPI
     std::string buy()
     {
         std::string instrument = stringInput("Enter the instrument name (e.g., BTC_USDC): ", std::regex("^[A-Za-z0-9_-]+$"), "Invalid instrument name.");
-        int amount = intInput("Enter the amount to buy: ", 1, 1000000);
+        double amount = doubleInput("Enter the amount to buy: ", 0.00001, 1000000);
         std::string order_type = stringInput("Enter the order type (market/limit): ", std::regex("^(market|limit)$"), "Invalid order type.");
 
         json request = {
@@ -136,7 +136,7 @@ namespace marketAPI
     std::string modifyOrder()
     {
         std::string order_id = stringInput("Enter the Order ID to modify: ", std::regex("^[A-Za-z0-9_-]+$"), "Invalid Order ID.");
-        int new_amount = intInput("Enter the new amount: ", 1, 1000000);
+        double new_amount = doubleInput("Enter the amount to buy: ", 0.00001, 1000000);
 
         json request = {
             {"jsonrpc", "2.0"},
