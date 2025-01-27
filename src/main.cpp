@@ -2,7 +2,6 @@
 #include "MarketAPI.hpp"
 #include "Logger.hpp"
 #include "NotificationHandler.hpp"
-#include <thread>
 /*
 
 */
@@ -55,7 +54,6 @@ int main() {
 
 /*
 ----- printing
-CMAKE
 auth??
 DOCS
 VIDEO
