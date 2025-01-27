@@ -39,7 +39,6 @@ void WebSocketClient::sendMessage(const std::string &message)
     try
     {
         ws_.write(net::buffer(message));
-        Logger::logIO("Message sent: " + message);
     }
     catch (const std::exception &e)
     {

@@ -16,16 +16,20 @@ void NotificationHandler::displayNotifications()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     size_t count = 0;
-
+    std::cout << "-------------------------------------------------------------------" << std::endl;
     while (!notifications_.empty() && count < maxCapacity_)
     {
         std::cout << "Notification: " << notifications_.front().dump(4) << std::endl;
         notifications_.pop();
         ++count;
     }
+    std::cout << "-------------------------------------------------------------------" << std::endl;
+
 
     if (count == 0)
     {
         std::cout << "No notifications available." << std::endl;
+        std::cout << "-------------------------------------------------------------------" << std::endl;
+
     }
 }

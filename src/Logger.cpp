@@ -8,11 +8,6 @@ void Logger::logInfo(const std::string &message)
     std::cout << "[INFO]: " << message << std::endl;
 }
 
-void Logger::logIO(const std::string &message)
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    std::cout << "[IO]: " << message << std::endl;
-}
 
 void Logger::logWarn(const std::string &message)
 {
@@ -29,15 +24,20 @@ void Logger::logError(const std::string &message)
 void Logger::logResult(const nlohmann::json &message){
     std::lock_guard<std::mutex> lock(mutex_);
     nlohmann::json output;
+    std::cout << "-------------------------------------------------------------------" << std::endl;
     if (message.contains("result")) {
+        std::cout << "Success!" << std::endl << std:: endl;
         output["result"] = message["result"];
     }
     if (message.contains("error")){
+        std::cout << "Error!" << std::endl << std:: endl;
+
         output["error"] = message["error"];
     }
     if (message.contains("usDiff")) {
-        output["usDiff"] = message["usDiff"];
+        output["Response time:(ms)"] = message["usDiff"];
     }
     std::cout << "Message Recieved" << output.dump(4) << std::endl;
+    std::cout << "-------------------------------------------------------------------" << std::endl;
 
 }

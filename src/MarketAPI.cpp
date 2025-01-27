@@ -50,6 +50,8 @@ namespace marketAPI
 
     void help()
     {
+        std::cout << "-------------------------------------------------------------------" << std::endl;
+
         std::cout << "EurekaExchange's functions\n"
                   << "0. Exit Program\n"
                   << "1. Print this help message\n"
@@ -61,6 +63,8 @@ namespace marketAPI
                   << "7. View current positions (auth required)\n"
                   << "8. Subscribe to a symbol (auth required)\n"
                   << "9. View unread notifications (auth required)\n";
+        std::cout << "-------------------------------------------------------------------" << std::endl;
+
     }
 
     std::string parse(int x)
@@ -102,7 +106,7 @@ namespace marketAPI
 
     std::string buy()
     {
-        std::string instrument = stringInput("Enter the instrument name (e.g., BTC-PERPETUAL): ", std::regex("^[A-Za-z0-9_-]+$"), "Invalid instrument name.");
+        std::string instrument = stringInput("Enter the instrument name (e.g., BTC_USDC): ", std::regex("^[A-Za-z0-9_-]+$"), "Invalid instrument name.");
         int amount = intInput("Enter the amount to buy: ", 1, 1000000);
         std::string order_type = stringInput("Enter the order type (market/limit): ", std::regex("^(market|limit)$"), "Invalid order type.");
 
@@ -144,7 +148,7 @@ namespace marketAPI
 
     std::string getOrderbook()
     {
-        std::string instrument = stringInput("Enter the instrument name (e.g., BTC-PERPETUAL): ", std::regex("^[A-Za-z0-9_-]+$"), "Invalid instrument name.");
+        std::string instrument = stringInput("Enter the instrument name (e.g., BTC_USDC): ", std::regex("^[A-Za-z0-9_-]+$"), "Invalid instrument name.");
 
         json request = {
             {"jsonrpc", "2.0"},
@@ -157,7 +161,7 @@ namespace marketAPI
 
     std::string getCurrentPositions()
     {
-        std::string currency = stringInput("Enter the currency (e.g., BTC): ", std::regex("^[A-Za-z]+$"), "Invalid currency name.");
+        std::string currency = stringInput("Enter the currency (e.g., BTC_USDC): ", std::regex("^[A-Za-z]+$"), "Invalid currency name.");
 
         json request = {
             {"jsonrpc", "2.0"},
@@ -173,8 +177,8 @@ namespace marketAPI
 std::string marketAPI::subscribe()
 {
     std::string symbol = stringInput(
-        "Enter the symbol to subscribe to (e.g., BTC-PERPETUAL): ",
-        std::regex("^[A-Za-z0-9_-]+$"),
+        "Enter the symbol to subscribe to (eg. deribit_price_statistics.ada_usd): ",
+        std::regex("^[A-Za-z0-9_.-]+$"),
         "Invalid symbol.");
 
     json request = {

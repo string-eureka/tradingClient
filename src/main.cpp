@@ -14,10 +14,10 @@ int main() {
         WebSocketClient client("test.deribit.com", "443", "/ws/api/v2", notificationHandler);
         client.connect();
         marketAPI::help();
-
+        Logger::logInfo("Welcome to EurekaExchange");
         std::string userInput;
+
         while (true) {
-            Logger::logIO("Waiting for user input...");
             sleep(1);
             std::cout << "Enter a message: ";
             std::getline(std::cin, userInput);
@@ -26,10 +26,14 @@ int main() {
             if (cleanInput == -1) {
                 Logger::logWarn("Invalid input received");
                 std::cout << "Invalid Input, Please Try Again!" << std::endl;
+                std::cout << "-------------------------------------------------------------------" << std::endl;
+
                 continue;
             } else if (cleanInput == 0) {
                 Logger::logInfo("Terminating session");
                 std::cout << "Thank you for using EurekaExchange" << std::endl;
+                std::cout << "-------------------------------------------------------------------" << std::endl;
+
                 break;
             } else if (cleanInput == 1) {
                 marketAPI::help();
@@ -53,8 +57,6 @@ int main() {
 
 
 /*
------ printing
-auth??
 DOCS
 VIDEO
 */
