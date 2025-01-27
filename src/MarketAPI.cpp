@@ -4,6 +4,7 @@ using json = nlohmann::json;
 
 namespace marketAPI
 {
+    // Utility functions to proccess websocket input
 
     std::string stringInput(const std::string &prompt, const std::regex &pattern, const std::string &error_message)
     {

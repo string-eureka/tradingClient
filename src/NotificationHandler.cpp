@@ -2,6 +2,10 @@
 
 NotificationHandler::NotificationHandler(size_t maxCapacity) : maxCapacity_(maxCapacity) {}
 
+/*
+The mutex prevents a race condition when a new notification is recieved when a notification is being read
+*/
+
 void NotificationHandler::addNotification(const nlohmann::json &notification)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -17,7 +21,7 @@ void NotificationHandler::displayNotifications()
     std::lock_guard<std::mutex> lock(mutex_);
     size_t count = 0;
     std::cout << "-------------------------------------------------------------------" << std::endl;
-    while (!notifications_.empty() && count < maxCapacity_)
+    while (!notifications_.empty() && count < 10)
     {
         std::cout << "Notification: " << notifications_.front().dump(4) << std::endl;
         notifications_.pop();

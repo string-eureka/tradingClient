@@ -1,5 +1,8 @@
 #include "Logger.hpp"
 
+
+// The mutex takes ownership of the output stream, to ensure sequential delivery of output
+
 std::mutex Logger::mutex_;
 
 void Logger::logInfo(const std::string &message)

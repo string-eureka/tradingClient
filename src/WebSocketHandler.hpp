@@ -10,7 +10,18 @@
 #include "NotificationHandler.hpp"
 #include "Logger.hpp"
 
+/*
+    The WebSocket Client estanblishes a secure connection to the Deribit API.
+    It spawns a non blocking thread to communicate with the server via a websocket.
 
+    The thread maintains a read loop of its own which awaits messages from the client, sends the response to the server
+    and outputs the response.
+
+    It also handles notifications from subscriptions, and places it in a FIFO queue, which can be accessed by the client.
+
+    Completely Async I/O was not used in order to prevent interference with the read stream and data inaccuracies.
+
+*/
 namespace beast = boost::beast;
 namespace net = boost::asio;
 namespace websocket = beast::websocket;
