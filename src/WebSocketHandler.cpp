@@ -1,27 +1,15 @@
 #include "WebSocketHandler.hpp"
 
-WebSocketClient::WebSocketClient(
-    const std::string &host,
-    const std::string &port,
-    const std::string &endpoint,
-    std::queue<nlohmann::json> &subscriptionQueue,
-    std::mutex &queueMutex
-)
-    : host_(host),
-      port_(port),
-      endpoint_(endpoint),
-      ssl_ctx_(net::ssl::context::tlsv12_client),
-      ws_(ioc_, ssl_ctx_),
-      subscriptionQueue_(subscriptionQueue),
-      queueMutex_(queueMutex) {}
-
+WebSocketClient::WebSocketClient(const std::string &host, const std::string &port, const std::string &endpoint,
+                                 NotificationHandler &notificationHandler)
+    : host_(host), port_(port), endpoint_(endpoint), sslCtx_(net::ssl::context::tlsv12_client),
+      ws_(ioc_, sslCtx_), notificationHandler_(notificationHandler) {}
 
 WebSocketClient::~WebSocketClient()
 {
-    close();
-    if (read_thread_.joinable())
+    if (readThread_.joinable())
     {
-        read_thread_.join();
+        readThread_.join();
     }
 }
 
@@ -29,30 +17,19 @@ void WebSocketClient::connect()
 {
     try
     {
-        // DNS Resolver
         tcp::resolver resolver(ioc_);
-        auto const results = resolver.resolve(host_, port_);
-
-        // Connect to the server
+        auto results = resolver.resolve(host_, port_);
         beast::get_lowest_layer(ws_).connect(results);
-
-        // Perform SSL handshake
         ws_.next_layer().handshake(net::ssl::stream_base::client);
-
-        // Perform WebSocket handshake
         ws_.handshake(host_, endpoint_);
-        std::cout << "WebSocket connection established to " << host_ << endpoint_ << std::endl;
 
-        startReading();
-    }
-    catch (const beast::system_error &se)
-    {
-        std::cerr << "WebSocket connection error: " << se.what() << std::endl;
-        throw;
+        Logger::logInfo("WebSocket connection established.");
+
+        readThread_ = std::thread(&WebSocketClient::readLoop, this);
     }
     catch (const std::exception &e)
     {
-        std::cerr << "Error: " << e.what() << std::endl;
+        Logger::logError(std::string("WebSocket connection error: ") + e.what());
         throw;
     }
 }
@@ -62,28 +39,12 @@ void WebSocketClient::sendMessage(const std::string &message)
     try
     {
         ws_.write(net::buffer(message));
+        Logger::logDebug("Message sent: " + message);
     }
     catch (const std::exception &e)
     {
-        std::cerr << "Send error: " << e.what() << std::endl;
+        Logger::logError(std::string("Send error: ") + e.what());
     }
-}
-
-void WebSocketClient::close()
-{
-    try
-    {
-        ws_.close(websocket::close_code::normal);
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << "Close error: " << e.what() << std::endl;
-    }
-}
-
-void WebSocketClient::startReading()
-{
-    read_thread_ = std::thread(&WebSocketClient::readLoop, this);
 }
 
 void WebSocketClient::readLoop()
@@ -95,28 +56,34 @@ void WebSocketClient::readLoop()
             beast::flat_buffer buffer;
             ws_.read(buffer);
 
-            std::string response = beast::buffers_to_string(buffer.data());
-            nlohmann::json jsonResponse;
+            auto response = beast::buffers_to_string(buffer.data());
+            nlohmann::json jsonResponse = nlohmann::json::parse(response);
 
-            try
+            if (jsonResponse.contains("method") && jsonResponse["method"] == "subscription")
             {
-                jsonResponse = nlohmann::json::parse(response);
-                if (jsonResponse.contains("method") && jsonResponse["method"] == "subscription")
-                {
-                    std::lock_guard<std::mutex> lock(queueMutex_);
-                    subscriptionQueue_.push(jsonResponse);
-                    continue;
-                }
-                std::cout << "Received: " << jsonResponse.dump(4) << std::endl;
+                notificationHandler_.addNotification(jsonResponse);
             }
-            catch (const nlohmann::json::exception &e)
+            else
             {
-                std::cerr << "JSON Parse Error: " << e.what() << std::endl;
+                Logger::logResult(jsonResponse);
             }
         }
     }
     catch (const std::exception &e)
     {
-        std::cerr << "Read error: " << e.what() << std::endl;
+        Logger::logError(std::string("Read loop error: ") + e.what());
+    }
+}
+
+void WebSocketClient::close()
+{
+    try
+    {
+        ws_.close(websocket::close_code::normal);
+        Logger::logInfo("WebSocket closed.");
+    }
+    catch (const std::exception &e)
+    {
+        Logger::logError(std::string("Close error: ") + e.what());
     }
 }

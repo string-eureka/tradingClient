@@ -8,22 +8,21 @@ using json = nlohmann::json;
 namespace marketAPI
 {
 
-    std::string getSafeInput(const std::string &prompt, const std::regex &pattern, const std::string &error_message)
+    std::string stringInput(const std::string &prompt, const std::regex &pattern, const std::string &error_message)
     {
         std::string input;
         while (true)
         {
             std::cout << prompt;
             std::getline(std::cin, input);
-            // if (std::regex_match(input, pattern)) {
+            if (std::regex_match(input, pattern)) {
             return input;
-            // }
+            }
             std::cerr << error_message << std::endl;
         }
     }
 
-    // Validate numeric input
-    int getSafeIntInput(const std::string &prompt, int min, int max)
+    int intInput(const std::string &prompt, int min, int max)
     {
         int value;
         while (true)
@@ -31,7 +30,7 @@ namespace marketAPI
             std::cout << prompt;
             if (std::cin >> value && value >= min && value <= max)
             {
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Clear input buffer
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 return value;
             }
             std::cerr << "Invalid input. Enter a number between " << min << " and " << max << ".\n";
@@ -92,8 +91,8 @@ namespace marketAPI
 
     std::string authenticate()
     {
-        std::string client_id = getSafeInput("Enter your Client ID: ", std::regex("^[a-zA-Z0-9_]+$"), "Invalid Client ID.");
-        std::string client_secret = getSafeInput("Enter your Client Secret: ", std::regex("^[a-zA-Z0-9_]+$"), "Invalid Client Secret.");
+        std::string client_id = stringInput("Enter your Client ID: ", std::regex("^[a-zA-Z0-9_]+$"), "Invalid Client ID.");
+        std::string client_secret = stringInput("Enter your Client Secret: ", std::regex("^[a-zA-Z0-9_]+$"), "Invalid Client Secret.");
 
         json request = {
             {"jsonrpc", "2.0"},
@@ -106,9 +105,9 @@ namespace marketAPI
 
     std::string buy()
     {
-        std::string instrument = getSafeInput("Enter the instrument name (e.g., BTC-PERPETUAL): ", std::regex("^[A-Za-z0-9_-]+$"), "Invalid instrument name.");
-        int amount = getSafeIntInput("Enter the amount to buy: ", 1, 1000000);
-        std::string order_type = getSafeInput("Enter the order type (market/limit): ", std::regex("^(market|limit)$"), "Invalid order type.");
+        std::string instrument = stringInput("Enter the instrument name (e.g., BTC-PERPETUAL): ", std::regex("^[A-Za-z0-9_-]+$"), "Invalid instrument name.");
+        int amount = intInput("Enter the amount to buy: ", 1, 1000000);
+        std::string order_type = stringInput("Enter the order type (market/limit): ", std::regex("^(market|limit)$"), "Invalid order type.");
 
         json request = {
             {"jsonrpc", "2.0"},
@@ -121,7 +120,7 @@ namespace marketAPI
 
     std::string cancel()
     {
-        std::string order_id = getSafeInput("Enter the Order ID to cancel: ", std::regex("^[A-Za-z0-9_-]+$"), "Invalid Order ID.");
+        std::string order_id = stringInput("Enter the Order ID to cancel: ", std::regex("^[A-Za-z0-9_-]+$"), "Invalid Order ID.");
 
         json request = {
             {"jsonrpc", "2.0"},
@@ -134,8 +133,8 @@ namespace marketAPI
 
     std::string modifyOrder()
     {
-        std::string order_id = getSafeInput("Enter the Order ID to modify: ", std::regex("^[A-Za-z0-9_-]+$"), "Invalid Order ID.");
-        int new_amount = getSafeIntInput("Enter the new amount: ", 1, 1000000);
+        std::string order_id = stringInput("Enter the Order ID to modify: ", std::regex("^[A-Za-z0-9_-]+$"), "Invalid Order ID.");
+        int new_amount = intInput("Enter the new amount: ", 1, 1000000);
 
         json request = {
             {"jsonrpc", "2.0"},
@@ -148,7 +147,7 @@ namespace marketAPI
 
     std::string getOrderbook()
     {
-        std::string instrument = getSafeInput("Enter the instrument name (e.g., BTC-PERPETUAL): ", std::regex("^[A-Za-z0-9_-]+$"), "Invalid instrument name.");
+        std::string instrument = stringInput("Enter the instrument name (e.g., BTC-PERPETUAL): ", std::regex("^[A-Za-z0-9_-]+$"), "Invalid instrument name.");
 
         json request = {
             {"jsonrpc", "2.0"},
@@ -161,7 +160,7 @@ namespace marketAPI
 
     std::string getCurrentPositions()
     {
-        std::string currency = getSafeInput("Enter the currency (e.g., BTC): ", std::regex("^[A-Za-z]+$"), "Invalid currency name.");
+        std::string currency = stringInput("Enter the currency (e.g., BTC): ", std::regex("^[A-Za-z]+$"), "Invalid currency name.");
 
         json request = {
             {"jsonrpc", "2.0"},
@@ -176,9 +175,9 @@ namespace marketAPI
 
 std::string marketAPI::subscribe()
 {
-    std::string symbol = getSafeInput(
+    std::string symbol = stringInput(
         "Enter the symbol to subscribe to (e.g., BTC-PERPETUAL): ",
-        std::regex("."),
+        std::regex("^[A-Za-z0-9_-]+$"),
         "Invalid symbol.");
 
     json request = {
@@ -186,6 +185,5 @@ std::string marketAPI::subscribe()
         {"id", 7},
         {"method", "private/subscribe"},
         {"params", {{"channels", json::array({symbol})}}}};
-    std::cout << request << std::endl;
     return request.dump();
 }

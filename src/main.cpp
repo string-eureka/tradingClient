@@ -1,78 +1,62 @@
 #include "WebSocketHandler.hpp"
 #include "MarketAPI.hpp"
-#include <queue>
-#include <mutex>
+#include "Logger.hpp"
+#include "NotificationHandler.hpp"
+#include <thread>
+/*
 
-std::mutex subscriptionQueueMutex;            // Mutex for thread-safe access
-std::queue<nlohmann::json> subscriptionQueue; // Global queue for subscription responses
+*/
+int main() {
+    Logger::logInfo("Starting EurekaExchange");
 
-int main()
-{
-    std::cout << "Welcome to EurekaExchange!" << std::endl;
+    try {
+        NotificationHandler notificationHandler(10);
 
-    try
-    {
-        WebSocketClient client("test.deribit.com", "443", "/ws/api/v2", subscriptionQueue, subscriptionQueueMutex);
+        WebSocketClient client("test.deribit.com", "443", "/ws/api/v2", notificationHandler);
         client.connect();
         marketAPI::help();
 
-        std::string user_input;
-        while (true)
-        {
+        std::string userInput;
+        while (true) {
+            Logger::logDebug("Waiting for user input...");
             sleep(1);
             std::cout << "Enter a message: ";
-            std::getline(std::cin, user_input);
+            std::getline(std::cin, userInput);
 
-            int clean_input = marketAPI::inputValidator(user_input);
-            if (clean_input == -1)
-            {
+            int cleanInput = marketAPI::inputValidator(userInput);
+            if (cleanInput == -1) {
+                Logger::logWarn("Invalid input received");
                 std::cout << "Invalid Input, Please Try Again!" << std::endl;
                 continue;
-            }
-            else if (clean_input == 0)
-            {
-                std::cout << "Terminating Session\n"
-                          << "Thank you for using EurekaExchange\n";
+            } else if (cleanInput == 0) {
+                Logger::logInfo("Terminating session");
+                std::cout << "Thank you for using EurekaExchange" << std::endl;
                 break;
-            }
-            else if (clean_input == 1)
-            {
+            } else if (cleanInput == 1) {
                 marketAPI::help();
                 continue;
-            }
-            else if (clean_input == 9)
-            {
-                std::lock_guard<std::mutex> lock(subscriptionQueueMutex); // Lock the mutex for safe access
-                int count = 0;
-                while (!subscriptionQueue.empty() && count < 10)
-                {
-                    std::cout << "Notification: " << subscriptionQueue.front().dump(4) << std::endl;
-                    subscriptionQueue.pop();
-                    ++count;
-                }
-                if (count == 0)
-                {
-                    std::cout << "No notifications available.\n";
-                }
+            } else if (cleanInput == 9) {
+                notificationHandler.displayNotifications();
                 continue;
             }
 
-            std::string message = marketAPI::parse(clean_input);
+            std::string message = marketAPI::parse(cleanInput);
             client.sendMessage(message);
         }
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << "Main Error: " << e.what() << std::endl;
+    } catch (const std::exception &e) {
+        Logger::logError(std::string("Main error: ") + e.what());
         return 1;
     }
 
+    Logger::logInfo("EurekaExchange terminated gracefully");
     return 0;
 }
 
-/*
 
-Fixing APIS
-Fix exit bug
-Latency benchmarking and Optimization
+/*
+----- printing
+CMAKE
+auth??
+DOCS
+VIDEO
 */

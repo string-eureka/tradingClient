@@ -2,7 +2,7 @@
 #include <string.h>
 #include <iostream>
 #include <algorithm>
-#include "json.hpp"
+#include "../include/json.hpp"
 
 namespace marketAPI
 {
@@ -16,4 +16,5 @@ namespace marketAPI
     std::string getOrderbook();
     std::string getCurrentPositions();
     std::string subscribe();
+    
 }
