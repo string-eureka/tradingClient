@@ -11,7 +11,7 @@ To get a local copy up and running follow these simple example steps.
 
 1. Clone the repo
    ```sh
-   git clone [https://github.com/string-eureka/ecom](https://github.com/string-eureka/tradingClient.git)
+   git clone https://github.com/string-eureka/tradingClient.git
    ```
 2. Create a new directory for the build files and navigate to it
    ```sh
